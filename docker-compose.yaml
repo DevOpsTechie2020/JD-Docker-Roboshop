@@ -1,34 +1,34 @@
 services:
   catalogue:
     build: ./catalogue
-    image: joindevops/catalogue:1.0.0
+    image: bokkrama/roboshop-docker:catalogue-v1
     container_name: catalogue
     depends_on:
     - mongodb
   user:
     build: ./user
-    image: joindevops/user:1.0.0
+    image: bokkrama/roboshop-docker:user-v1
     container_name: user
     depends_on:
     - redis
     - mongodb
   cart:
     build: ./cart
-    image: joindevops/cart:1.0.0
+    image: bokkrama/roboshop-docker:cart-v1
     container_name: cart
     depends_on:
     - redis
     - catalogue
   shipping:
     build: ./shipping
-    image: joindevops/shipping:1.0.0
+    image: bokkrama/roboshop-docker:shipping-v1
     container_name: shipping
     depends_on:
     - mysql
     - cart
   payment:
     build: ./payment
-    image: joindevops/payment:1.0.0
+    image: bokkrama/roboshop-docker:payment-v1
     container_name: payment
     environment:
       CART_HOST: "cart"
@@ -44,7 +44,7 @@ services:
     - user
   frontend:
     build: ./frontend
-    image: joindevops/frontend:1.0.0
+    image: bokkrama/roboshop-docker:frontend-v1
     container_name: frontend
     ports:
       - "80:80"
@@ -56,24 +56,36 @@ services:
     - payment
   mongodb:
     build: ./mongodb
-    image: joindevops/mongodb:1.0.0
+    image: bokkrama/roboshop-docker:mongodb-v1
     container_name: mongodb
-  
+    volumes:
+      - mongodb:/data/db
   redis:
     image: redis:7.0
     container_name: redis
+    volumes:
+      - redis:/data
   mysql:
     build: ./mysql
-    image: joindevops/mysql:1.0.0
+    image: bokkrama/roboshop-docker:mysql-v1
     container_name: mysql
+    volumes:
+      - mysql:/var/lib/mysql
   rabbitmq:
     image: rabbitmq:3
     environment: 
       RABBITMQ_DEFAULT_USER: roboshop
       RABBITMQ_DEFAULT_PASS: roboshop123
     container_name: rabbitmq
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
 networks:
   default:
     driver: bridge
     name: roboshop
     external: false
+volumes:
+  mongodb:
+  redis:
+  mysql:
+  rabbitmq:
